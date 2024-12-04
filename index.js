@@ -1,8 +1,16 @@
 const express = require("express");
-
 const cors = require("cors");
 require("dotenv").config();
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const mongoose = require("mongoose");
+
+const {
+  postUser,
+  getData,
+  getSingleData,
+  updateData,
+  deleteUser,
+} = require("./controller/CRUDOperation");
+const Movie = require("./Models/MovieSchema");
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -11,46 +19,33 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+mongoose.set("strictQuery", true);
 
 /*********** MondoDB ***********/
 const uri = process.env.MONGODB_URI;
 
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
-const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  },
+// connection database
+mongoose.connect(uri);
+
+// Create Data
+app.post("/movies", postUser);
+
+// Read Data
+app.get("/", (req, res) => {
+  res.send("Welcome to Movie");
 });
+// Read Data
+app.get("/movies", getData);
 
-async function run() {
-  try {
-    // const database
-    const movieCollection = client.db("Movie-Portal").collection("Movie");
+// Read Single Data
+app.get("/movies/:id", getSingleData);
 
-    app.get("/", (req, res) => {
-      res.send("welcome");
-    });
-    // Create Operation
-    app.post("/movie", async (req, res) => {
-      const movie = req.body;
-      const result = await movieCollection.insertOne(movie);
-      res.send(result);
-    });
-    // Read OperationOptions
-    // app.get("/movie", async (req, res) => {
-    //   const cursor = movieCollection.find();
-    //   const result = await cursor.toArray();
-    //   res.send(result);
-    // });
-  } finally {
-  }
-}
-run().catch(console.dir);
+// Update Data
+app.put("/movies/:id", updateData);
 
-/*********** MondoDB ***********/
+// Delete Data
+app.delete("/movies/:id", deleteUser);
 
-app.listen(port, (req, res) => {
-  console.log(`The server is running on port: ${port}`);
+app.listen(port, () => {
+  console.log(`The server is running on Port: ${port}`);
 });
