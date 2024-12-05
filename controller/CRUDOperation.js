@@ -1,38 +1,110 @@
 const Movie = require("../Models/MovieSchema");
+const User = require("../Models/user");
+const wrapAsync = require("../Error/wrapAsync");
 
-// Create Data
-const postUser = async (req, res) => {
-  const postData = new Movie(req.body);
-  await postData.save();
-  res.send({ message: "Data post Successfully." });
+// Added
+// Create A Data
+const postUser = wrapAsync(async (req, res) => {
+  const postData = new Movie({ ...req.body });
+  const saveToDatabase = await postData.save();
+  res.send({
+    data: saveToDatabase,
+    message: "Successfully created",
+    success: true,
+  });
+});
+
+// Added
+// Read All Data
+const getData = wrapAsync(async (req, res) => {
+  const allMovie = await Movie.find();
+
+  if (!allMovie.length) {
+    return res.send({
+      data: allMovie,
+      message: "No movie found!",
+      success: false,
+    });
+  }
+  return res.send({ data: allMovie, message: "All Movies", success: true });
+});
+// Added
+// Read Trending Data
+const getTrendingData = wrapAsync(async (req, res) => {
+  const trendingMovies = await Movie.find().sort({ rating: -1 }).limit(6);
+
+  if (!trendingMovies.length) {
+    return res.send({
+      data: trendingMovies,
+      message: "No trending movie found!",
+      success: false,
+    });
+  }
+  return res.send({
+    data: trendingMovies,
+    message: "All trending movie is found!",
+    success: true,
+  });
+});
+
+// Read Data Banner
+const getBannerData = async (req, res) => {
+  const top3User = await Movie.find().sort({ rating: -1 }).limit(3);
+  res.send(top3User);
 };
 
-// Read Data
-const getData = async (req, res) => {
-  const allUser = await Movie.find();
-  res.send(allUser);
-};
-
+// Added
 // Read Single Data
 const getSingleData = async (req, res) => {
   const id = req.params.id;
   const singleUser = await Movie.findById(id);
-  res.send(singleUser);
+  if (!singleUser) {
+    return res.send({
+      data: allMovie,
+      message: "No movie found!",
+      success: false,
+    });
+  }
+  return res.send({
+    data: singleUser,
+    message: "Your desire movie is found",
+    success: true,
+  });
 };
 
+// Added
 // Update Data
-const updateData = async (req, res) => {
+const updateData = wrapAsync(async (req, res) => {
   const id = req.params.id;
-  const updateData = req.body;
-  await Movie.findByIdAndUpdate(id, updateData);
-  res.send("Update Successful.");
-};
+  const updatedMovie = await Movie.findByIdAndUpdate(
+    id,
+    { ...req.body },
+    { new: true }
+  );
+  return res.send({
+    data: updatedMovie,
+    message: "Successfully updated 😊",
+    success: true,
+  });
+});
 
+// Added
 // Delete Data
-const deleteUser = async (req, res) => {
+const deleteUser = wrapAsync(async (req, res) => {
   const id = req.params.id;
-  await Movie.findByIdAndDelete(id);
-  res.send("Delete a user successfully.");
-};
+  const deleted = await Movie.findByIdAndDelete(id);
+  if (!deleted) {
+    return res.send({ message: "Failed to delete.", success: false });
+  }
+  return res.send({ message: "Successfully deleted.", success: true });
+});
 
-module.exports = { postUser, getData, getSingleData, updateData, deleteUser };
+module.exports = {
+  postUser,
+  getData,
+  getTrendingData,
+  getBannerData,
+  getSingleData,
+  updateData,
+  deleteUser,
+};

@@ -1,16 +1,19 @@
-const express = require("express");
-const cors = require("cors");
 require("dotenv").config();
+const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors");
+const wrapAsync = require("../Error/wrapAsync");
 
 const {
   postUser,
   getData,
+  getBannerData,
   getSingleData,
   updateData,
   deleteUser,
 } = require("./controller/CRUDOperation");
 const Movie = require("./Models/MovieSchema");
+
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -21,11 +24,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 mongoose.set("strictQuery", true);
 
-/*********** MondoDB ***********/
-const uri = process.env.MONGODB_URI;
 
 // connection database
-mongoose.connect(uri);
+const uri = process.env.MONGODB_URI;
+mongoose.connect(uri).then(() => console.log("Database connected"));
 
 // Create Data
 app.post("/movies", postUser);
@@ -36,6 +38,9 @@ app.get("/", (req, res) => {
 });
 // Read Data
 app.get("/movies", getData);
+
+// Read Data Banner
+app.get("/movieBanner", getBannerData);
 
 // Read Single Data
 app.get("/movies/:id", getSingleData);

@@ -7,31 +7,36 @@ const movieSchema = new Schema(
       type: String,
       require: true,
     },
-    movieTitle: {
-      type: String,
-      require: true,
-    },
+    movieTitle: { type: String, required: true, trim: true },
     genre: {
-      type: Array,
-      require: true,
+      type: String,
+      enum: [
+        "comedy",
+        "drama",
+        "horror",
+        "adventure",
+        "war",
+        "crime",
+        "action",
+        "sci-fi",
+      ],
+      required: [true, "Please select a genre."],
     },
-    duration: {
-      type: Number,
-      require: true,
-      
-    },
+    duration: { type: Number, required: true, min: 60 },
     releaseYear: {
       type: Number,
-      require: true,
+      required: true,
+      min: 1800,
+      max: new Date().getFullYear(),
     },
     rating: {
       type: Number,
-      require: true,
+      required: true,
+      min: 0,
+      max: 10,
     },
-    summery: {
-      type: String,
-      require: true,
-    },
+    summary: { type: String, required: true },
+    authorEmail: { type: String, required: true, match: /.+\@.+\..+/ },
   },
   {
     timestamps: true,
