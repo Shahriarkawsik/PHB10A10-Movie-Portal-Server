@@ -48,10 +48,10 @@ const getTrendingData = wrapAsync(async (req, res) => {
 });
 
 // Read Data Banner
-const getBannerData = async (req, res) => {
+const getBannerData = wrapAsync(async (req, res) => {
   const top3User = await Movie.find().sort({ rating: -1 }).limit(3);
   res.send(top3User);
-};
+});
 
 // Added
 // Read Single Data
@@ -99,6 +99,62 @@ const deleteUser = wrapAsync(async (req, res) => {
   return res.send({ message: "Successfully deleted.", success: true });
 });
 
+// Add User
+const AddUser = wrapAsync(async (req, res) => {
+  const user = new User({ ...req.body });
+  await user.save();
+  res.send({
+    data: user,
+    message: "User created successfully",
+    success: true,
+  });
+});
+
+// Favorite Movie Section
+
+// Create Favorite Movie
+const createFavoriteMovie = wrapAsync(async (req, res) => {
+  const { email, id } = req.body;
+  let favorites = await User.findOne({ email });
+  if (favorites.favorite.includes(id))
+    return res.send({
+      data: favorites,
+      message: "Al ready added.",
+      success: true,
+    });
+  favorites.favorite.push(id);
+  favorites = await favorites.save();
+  return res.send({ data: favorites, message: "", success: true });
+});
+
+// Read Favorite Movie
+const readFavoriteMovie = wrapAsync(async (req, res) => {
+  const { email } = req.body;
+  const favorites = await User.find({ email }).populate("favorite");
+  res.send({ data: favorites, message: "", success: true });
+});
+
+// Delete Favorite Movie
+const deleteFavoriteMovie = wrapAsync(async (req, res) => {
+  const { id } = req.params;
+  const { email } = req.body;
+  const favoriteMovieId = mongoose.Types.ObjectId(id);
+  let user = await User.findOne({ email, favorite: favoriteMovieId });
+
+  if (!user) {
+    return res.send({
+      message: "User or Favorite movie not found!",
+      success: false,
+    });
+  }
+
+  user.favorite = user.favorite.filter(
+    (movieId) => !movieId.equals(favoriteMovieId)
+  );
+  await user.save();
+  return res.send({ message: "Favorite movie removed.", success: true });
+});
+
 module.exports = {
   postUser,
   getData,
@@ -107,4 +163,8 @@ module.exports = {
   getSingleData,
   updateData,
   deleteUser,
+  AddUser,
+  createFavoriteMovie,
+  readFavoriteMovie,
+  deleteFavoriteMovie,
 };
