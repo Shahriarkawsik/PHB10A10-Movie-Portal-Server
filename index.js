@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-// const wrapAsync = require("./Error/wrapAsync");
+const wrapAsync = require("./Error/wrapAsync");
 
 const {
   postUser,
@@ -13,6 +13,7 @@ const {
   updateData,
   deleteUser,
   AddUser,
+  readUser,
   createFavoriteMovie,
   readFavoriteMovie,
   deleteFavoriteMovie,
@@ -20,7 +21,7 @@ const {
 const Movie = require("./Models/MovieSchema");
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
@@ -54,17 +55,34 @@ app.put("/movies/:id", updateData);
 // Delete Data
 app.delete("/movies/:id", deleteUser);
 
-// Add User
+// Create User
 app.post("/user", AddUser);
 
-// Create Favorite Movie
-app.post("/favorite", createFavoriteMovie);
+// Read User
+app.get("/user", readUser);
 
 // Read Favorite Movie
 app.get("/favorite", readFavoriteMovie);
 
+// Create Favorite Movie
+app.post("/favorite", createFavoriteMovie);
+
 // Delete Favorite Movie
 app.delete("/favorite/:id", deleteFavoriteMovie);
+
+// Path Not Found
+app.use((req, res, next) => {
+  next();
+});
+
+// Handle Async & Sync Error
+app.use((err, req, res, next) => {
+  console.log(err);
+  res.send({
+    message: "Oops! Something went wrong.",
+    success: false,
+  });
+});
 
 app.listen(port, () => {
   console.log(`The server is running on Port: ${port}`);

@@ -99,7 +99,7 @@ const deleteUser = wrapAsync(async (req, res) => {
   return res.send({ message: "Successfully deleted.", success: true });
 });
 
-// Add User
+// Create User
 const AddUser = wrapAsync(async (req, res) => {
   const user = new User({ ...req.body });
   await user.save();
@@ -108,6 +108,20 @@ const AddUser = wrapAsync(async (req, res) => {
     message: "User created successfully",
     success: true,
   });
+});
+
+// Read user
+const readUser = wrapAsync(async (req, res) => {
+  const allMovie = await Movie.find();
+
+  if (!allMovie.length) {
+    return res.send({
+      data: allMovie,
+      message: "No movie found!",
+      success: false,
+    });
+  }
+  return res.send({ data: allMovie, message: "All Movies", success: true });
 });
 
 // Favorite Movie Section
@@ -124,7 +138,11 @@ const createFavoriteMovie = wrapAsync(async (req, res) => {
     });
   favorites.favorite.push(id);
   favorites = await favorites.save();
-  return res.send({ data: favorites, message: "", success: true });
+  return res.send({
+    data: favorites,
+    message: "Successfully Added in favorite list.",
+    success: true,
+  });
 });
 
 // Read Favorite Movie
@@ -164,6 +182,7 @@ module.exports = {
   updateData,
   deleteUser,
   AddUser,
+  readUser,
   createFavoriteMovie,
   readFavoriteMovie,
   deleteFavoriteMovie,
