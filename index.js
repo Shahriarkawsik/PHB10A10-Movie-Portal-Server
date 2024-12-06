@@ -43,6 +43,9 @@ app.get("/", (req, res) => {
 // Read Data
 app.get("/movies", getData);
 
+// Read Trending Data
+app.get("/trendingMovie", getTrendingData);
+
 // Read Data Banner
 app.get("/movieBanner", getBannerData);
 

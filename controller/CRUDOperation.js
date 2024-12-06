@@ -1,7 +1,7 @@
 const Movie = require("../Models/MovieSchema");
 const User = require("../Models/user");
 const wrapAsync = require("../Error/wrapAsync");
-
+const mongoose = require("mongoose");
 // Added
 // Create A Data
 const postUser = wrapAsync(async (req, res) => {
@@ -133,7 +133,7 @@ const createFavoriteMovie = wrapAsync(async (req, res) => {
   if (favorites.favorite.includes(id))
     return res.send({
       data: favorites,
-      message: "Al ready added.",
+      message: "Already added.",
       success: true,
     });
   favorites.favorite.push(id);
@@ -147,16 +147,24 @@ const createFavoriteMovie = wrapAsync(async (req, res) => {
 
 // Read Favorite Movie
 const readFavoriteMovie = wrapAsync(async (req, res) => {
-  const { email } = req.body;
-  const favorites = await User.find({ email }).populate("favorite");
-  res.send({ data: favorites, message: "", success: true });
+  const { email } = req.query;
+  // console.log("/favorite", email);
+
+  const favorites = await User.findOne({ email }).populate("favorite");
+
+  res.send({
+    data: favorites,
+    message: "Your favorite data is shown.",
+    success: true,
+  });
 });
 
 // Delete Favorite Movie
 const deleteFavoriteMovie = wrapAsync(async (req, res) => {
   const { id } = req.params;
   const { email } = req.body;
-  const favoriteMovieId = mongoose.Types.ObjectId(id);
+
+  const favoriteMovieId = new mongoose.Types.ObjectId(id);
   let user = await User.findOne({ email, favorite: favoriteMovieId });
 
   if (!user) {
