@@ -2,6 +2,7 @@ const Movie = require("../Models/MovieSchema");
 const User = require("../Models/user");
 const wrapAsync = require("../Error/wrapAsync");
 const mongoose = require("mongoose");
+
 // Added
 // Create A Data
 const postUser = wrapAsync(async (req, res) => {
@@ -174,11 +175,29 @@ const deleteFavoriteMovie = wrapAsync(async (req, res) => {
     });
   }
 
-  user.favorite = user.favorite.filter(
+  user.favorite = User.favorite.filter(
     (movieId) => !movieId.equals(favoriteMovieId)
   );
   await user.save();
   return res.send({ message: "Favorite movie removed.", success: true });
+});
+
+// Search
+const searchMovie = wrapAsync(async (req, res) => {
+  const { search } = req.body;
+  console.log("Key", search);
+
+  const findMovie = await Movie.find({
+    movieTitle: { $regex: search, $options: "i" },
+  });
+  console.log(findMovie);
+  return res.send({
+    data: findMovie,
+    message: findMovie.length
+      ? `${findMovie.length} movies are found`
+      : "Not found",
+    success: true,
+  });
 });
 
 module.exports = {
@@ -191,6 +210,7 @@ module.exports = {
   deleteUser,
   AddUser,
   readUser,
+  searchMovie,
   createFavoriteMovie,
   readFavoriteMovie,
   deleteFavoriteMovie,

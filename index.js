@@ -16,6 +16,7 @@ const {
   readUser,
   createFavoriteMovie,
   readFavoriteMovie,
+  searchMovie,
   deleteFavoriteMovie,
 } = require("./controller/CRUDOperation");
 const Movie = require("./Models/MovieSchema");
@@ -24,7 +25,16 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors());
+// app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://movie-portal-abed2.web.app",
+      "https://console.firebase.google.com/project/movie-portal-abed2/overview",
+    ],
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 mongoose.set("strictQuery", true);
@@ -51,6 +61,9 @@ app.get("/movieBanner", getBannerData);
 
 // Read Single Data
 app.get("/movies/:id", getSingleData);
+
+// Search
+app.post("/search", searchMovie);
 
 // Update Data
 app.put("/movies/:id", updateData);
