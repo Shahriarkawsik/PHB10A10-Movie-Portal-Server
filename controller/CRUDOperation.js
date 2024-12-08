@@ -3,7 +3,6 @@ const User = require("../Models/user");
 const wrapAsync = require("../Error/wrapAsync");
 const mongoose = require("mongoose");
 
-// Added
 // Create A Data
 const postUser = wrapAsync(async (req, res) => {
   const postData = new Movie({ ...req.body });
@@ -15,7 +14,6 @@ const postUser = wrapAsync(async (req, res) => {
   });
 });
 
-// Added
 // Read All Data
 const getData = wrapAsync(async (req, res) => {
   const allMovie = await Movie.find();
@@ -29,7 +27,7 @@ const getData = wrapAsync(async (req, res) => {
   }
   return res.send({ data: allMovie, message: "All Movies", success: true });
 });
-// Added
+
 // Read Trending Data
 const getTrendingData = wrapAsync(async (req, res) => {
   const trendingMovies = await Movie.find().sort({ rating: -1 }).limit(6);
@@ -54,7 +52,6 @@ const getBannerData = wrapAsync(async (req, res) => {
   res.send(top3User);
 });
 
-// Added
 // Read Single Data
 const getSingleData = async (req, res) => {
   const id = req.params.id;
@@ -73,7 +70,6 @@ const getSingleData = async (req, res) => {
   });
 };
 
-// Added
 // Update Data
 const updateData = wrapAsync(async (req, res) => {
   const id = req.params.id;
@@ -89,7 +85,6 @@ const updateData = wrapAsync(async (req, res) => {
   });
 });
 
-// Added
 // Delete Data
 const deleteUser = wrapAsync(async (req, res) => {
   const id = req.params.id;
