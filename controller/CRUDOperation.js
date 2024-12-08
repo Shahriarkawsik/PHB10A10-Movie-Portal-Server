@@ -17,7 +17,6 @@ const postUser = wrapAsync(async (req, res) => {
 // Read All Data
 const getData = wrapAsync(async (req, res) => {
   const allMovie = await Movie.find();
-
   if (!allMovie.length) {
     return res.send({
       data: allMovie,
@@ -170,7 +169,7 @@ const deleteFavoriteMovie = wrapAsync(async (req, res) => {
     });
   }
 
-  user.favorite = User.favorite.filter(
+  user.favorite = user.favorite.filter(
     (movieId) => !movieId.equals(favoriteMovieId)
   );
   await user.save();
